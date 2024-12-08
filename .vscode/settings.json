@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "error_handling.h": "c",
+        "kernel.h": "c"
+    }
+}
