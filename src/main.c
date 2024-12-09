@@ -44,6 +44,12 @@ void saadc_handler(nrfx_saadc_evt_t const *p_event)
 
 int main(void)
 {
+    nrf_gpio_cfg_output(RED_LED);
+    nrf_gpio_pin_set(RED_LED); // => OFF
+
+    nrf_gpio_cfg_output(POWER_MOSFET);
+    nrf_gpio_pin_clear(POWER_MOSFET); // => OFF
+
     timer_init();
     saadc_init(saadc_handler);
     ppi_init();
@@ -59,7 +65,7 @@ int main(void)
 
             coil_power_raw = vddh_div5_raw * coil_voltage_raw;
 
-            LOG_ERR("current saadc bufffer address: 0x%x result %d ", (uint32_t)saadc_results, coil_power_raw);
+            LOG_INF("current saadc bufffer address: 0x%x result %d ", (uint32_t)saadc_results, coil_power_raw);
         }
 
         k_msleep(1);
