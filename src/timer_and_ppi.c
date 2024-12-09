@@ -61,3 +61,9 @@ void timer_for_saadc_sampling_start(void)
 {
     nrfx_timer_enable(&timer_to_sample_saadc_via_ppi_instance);
 }
+
+void timer_for_saadc_sampling_stop(void)
+{
+    nrfx_timer_disable(&timer_to_sample_saadc_via_ppi_instance);
+    nrfx_timer_clear(&timer_to_sample_saadc_via_ppi_instance); // resets timer counter to 0
+}

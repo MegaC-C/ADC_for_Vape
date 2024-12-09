@@ -11,5 +11,6 @@
 void timer_init(void);
 void ppi_init(void);
 void timer_for_saadc_sampling_start(void);
+void timer_for_saadc_sampling_stop(void);
 
 #endif
