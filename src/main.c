@@ -12,9 +12,9 @@ K_SEM_DEFINE(saadc_ready_sem, 0, 1);
 //  Declare variable used to keep track of which buffer was last assigned to the SAADC driver
 uint8_t saadc_buffer_num = 0;
 volatile int16_t *saadc_results;
-int32_t vddh_div5_raw    = 0;
-int32_t coil_voltage_raw = 0;
-int32_t coil_power_raw   = 0;
+int32_t vddh_div5_voltage_V = 0;
+int32_t coil_current_A      = 0;
+int32_t coil_resistance_Ohm = 0;
 
 void saadc_handler(nrfx_saadc_evt_t const *p_event)
 {
@@ -84,14 +84,14 @@ int main(void)
     {
         k_sem_take(&saadc_done_sem, K_FOREVER);
 
-        vddh_div5_raw    = (int32_t)saadc_results[0];
-        coil_voltage_raw = (int32_t)saadc_results[1];
+        vddh_div5_voltage_V = (int32_t)saadc_results[0] * FACTOR_RAW_BATTERY_TO_VOLTAGE_V;
+        coil_current_A      = (int32_t)saadc_results[1] * FACTOR_RAW_COIL_TO_AMPERE_A;
 
-        coil_power_raw = vddh_div5_raw * coil_voltage_raw;
+        coil_resistance_Ohm = vddh_div5_voltage_V / coil_current_A;
 
-        LOG_INF("%d", coil_power_raw);
+        LOG_INF("%dV, %dA, %dOhm", vddh_div5_voltage_V, coil_current_A, coil_resistance_Ohm);
 
-        if (coil_power_raw > 300000)
+        if (coil_resistance_Ohm > 300000)
         {
             stop_heating();
         }

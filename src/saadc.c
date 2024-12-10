@@ -8,14 +8,14 @@ static const nrfx_saadc_adv_config_t saadc_peripheral_config = {
     .oversampling      = NRF_SAADC_OVERSAMPLE_DISABLED,
     .burst             = NRF_SAADC_BURST_DISABLED,
     .internal_timer_cc = 0,
-    .start_on_end      = false};
+    .start_on_end      = false}; // when false then PPI must handle it
 
-static const nrfx_saadc_channel_t saadc_left_sensor_channel_config = {
+static const nrfx_saadc_channel_t saadc_battery_voltage_channel_config = {
     .channel_config = {
         .resistor_p = NRF_SAADC_RESISTOR_DISABLED,
         .resistor_n = NRF_SAADC_RESISTOR_DISABLED,
-        .gain       = NRF_SAADC_GAIN1_2,
-        .reference  = NRF_SAADC_REFERENCE_VDD4,
+        .gain       = NRF_SAADC_GAIN1_6,
+        .reference  = NRF_SAADC_REFERENCE_INTERNAL,
         .acq_time   = NRF_SAADC_ACQTIME_5US,
         .mode       = NRF_SAADC_MODE_SINGLE_ENDED,
         .burst      = NRF_SAADC_BURST_DISABLED},
@@ -23,31 +23,18 @@ static const nrfx_saadc_channel_t saadc_left_sensor_channel_config = {
     .pin_n         = NRF_SAADC_INPUT_DISABLED,
     .channel_index = 0};
 
-static const nrfx_saadc_channel_t saadc_right_sensor_channel_config = {
+static const nrfx_saadc_channel_t saadc_coil_current_channel_config = {
     .channel_config = {
         .resistor_p = NRF_SAADC_RESISTOR_DISABLED,
         .resistor_n = NRF_SAADC_RESISTOR_DISABLED,
-        .gain       = NRF_SAADC_GAIN1_2,
-        .reference  = NRF_SAADC_REFERENCE_VDD4,
-        .acq_time   = NRF_SAADC_ACQTIME_10US,
+        .gain       = NRF_SAADC_GAIN1_3,
+        .reference  = NRF_SAADC_REFERENCE_INTERNAL,
+        .acq_time   = NRF_SAADC_ACQTIME_10US, // min 10us when VDDHDIV5 as input
         .mode       = NRF_SAADC_MODE_SINGLE_ENDED,
         .burst      = NRF_SAADC_BURST_DISABLED},
     .pin_p         = (nrf_saadc_input_t)NRF_SAADC_INPUT_AIN4,
     .pin_n         = NRF_SAADC_INPUT_DISABLED,
     .channel_index = 1};
-
-static const nrfx_saadc_channel_t saadc_battery_voltage_channel_config = {
-    .channel_config = {
-        .resistor_p = NRF_SAADC_RESISTOR_DISABLED,
-        .resistor_n = NRF_SAADC_RESISTOR_DISABLED,
-        .gain       = NRF_SAADC_GAIN1_2,
-        .reference  = NRF_SAADC_REFERENCE_INTERNAL,
-        .acq_time   = NRF_SAADC_ACQTIME_40US,
-        .mode       = NRF_SAADC_MODE_SINGLE_ENDED,
-        .burst      = NRF_SAADC_BURST_DISABLED},
-    .pin_p         = (nrf_saadc_input_t)NRF_SAADC_INPUT_VDDHDIV5,
-    .pin_n         = NRF_SAADC_INPUT_DISABLED,
-    .channel_index = 2};
 
 void saadc_init(nrfx_saadc_event_handler_t saadc_event_handler)
 {
@@ -63,8 +50,8 @@ void saadc_init(nrfx_saadc_event_handler_t saadc_event_handler)
     nrfx_err = nrfx_saadc_offset_calibrate(NULL);
     NRFX_ERR_CHECK(nrfx_err, "Cannot calibrate SAADC")
 
-    nrfx_err = nrfx_saadc_channel_config(&saadc_left_sensor_channel_config);
-    nrfx_err = nrfx_saadc_channel_config(&saadc_right_sensor_channel_config);
+    nrfx_err = nrfx_saadc_channel_config(&saadc_battery_voltage_channel_config);
+    nrfx_err = nrfx_saadc_channel_config(&saadc_coil_current_channel_config);
     NRFX_ERR_CHECK(nrfx_err, "Configuring SAADC channels failed");
 
     nrfx_err = nrfx_saadc_advanced_mode_set(nrfx_saadc_channels_configured_get(),
